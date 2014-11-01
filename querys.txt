@@ -1,0 +1,58 @@
+--Busqueda Filtrada por Booking
+select ob.nro_booking ,od.num_dua ,
+od.cod_aduana ,od.cod_regimen
+ from ope_booking ob join ope_dua od
+on (ob.codemp = od.codemp and ob.anio = od.anio_booking and
+ ob.item = od.item_booking )
+ join OPE_DUA_DOCUMENTOS_HISTORIAL odh on
+ (odh.codemp = od.codemp and odh.anio_dua = od.anio_dua and
+ odh.cod_aduana = od.cod_aduana and odh.cod_regimen = od.cod_regimen and
+ odh.num_dua = od.num_dua)
+ where ((ob.nro_booking like '%578%')
+ or (od.num_dua like '%423%')
+ or (od.nro_slp like '%1%')) and
+ (((current_date - odh.fec_actividad)30  3) or
+ ((current_date - odh.fec_actividad)30  6) or
+ ((current_date - odh.fec_actividad)30  12) );
+
+--Query de Noticias 
+SELECT FEC_NOTIFICACION,CABECERA,
+RESUMEN,DESCRIPCION,RUTA_IMAGEN
+FROM ope_slp_notificaciones
+WHERE CODEMP = '08' AND
+COD_APP = '001' AND
+COD_CLIENTE = '20517661211' ORDER BY FEC_NOTIFICACION DESC;
+
+ --pagDUA1
+
+select ESTADO , canal
+from ope_dua where       CODEMP = '08' and
+    ANIO_DUA = '2014' and
+    COD_ADUANA  = '118' and
+    COD_REGIMEN = '40' and
+    NUM_DUA = '234234'
+
+select CODEMP,
+    ANIO_DUA,
+    COD_ADUANA,
+    COD_REGIMEN,
+    NUM_DUA,
+    ITEM,
+    ACCION,
+    SOLICITADO,
+    DOCUMENTO,
+    FEC_ACTIVIDAD,
+    OBSERVACION as 'ultimo evento'
+from ope_dua_documentos_historial
+where CODEMP = '08' and
+    ANIO_DUA = '2014' and
+    COD_ADUANA  = '118' and
+    COD_REGIMEN = '40' and
+    NUM_DUA = '234234' and
+    ITEM = (select max(odd.item) from ope_dua_documentos_historial odd
+      where odd.CODEMP = '08' and
+    odd.ANIO_DUA = '2014' and
+    odd.COD_ADUANA  = '118' and
+    odd.COD_REGIMEN = '40' and
+    odd.NUM_DUA = '234234'
+    )
