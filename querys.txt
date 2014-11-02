@@ -56,3 +56,121 @@ where CODEMP = '08' and
     odd.COD_REGIMEN = '40' and
     odd.NUM_DUA = '234234'
     )
+
+Actualizado 01/11/2014
+
+-- pagDua1.html Detalle
+
+select FEC_ACTIVIDAD,
+    OBSERVACION,
+    ACCION,
+    SOLICITADO,
+    DOCUMENTO
+from ope_dua_documentos_historial
+where CODEMP = '08' and
+    ANIO_DUA = '2014' and
+    COD_ADUANA  = '118' and
+    COD_REGIMEN = '40' and
+    NUM_DUA = '234234'
+order by FEC_ACTIVIDAD desc;
+
+
+-- pagDuaDetalle.html cabecera
+
+select FEC_ACTIVIDAD,
+    OBSERVACION,
+    ACCION,
+    SOLICITADO,
+    DOCUMENTO
+from ope_dua_documentos_historial
+where CODEMP = '08' and
+    ANIO_DUA = '2014' and
+    COD_ADUANA  = '118' and
+    COD_REGIMEN = '40' and
+    NUM_DUA = '234234' and
+    ITEM = '2'
+order by FEC_ACTIVIDAD desc;
+
+-- pagDuaDetalle.html detalle Documentos
+
+select ITEM_ATTACH,
+    RUTA,
+    ARCHIVO
+from ope_dua_documentos_attach
+where CODEMP = '08' and
+    ANIO_DUA = '2014' and
+    COD_ADUANA  = '118' and
+    COD_REGIMEN = '40' and
+    NUM_DUA = '234234' and
+    ITEM = '2'
+order by FECREG desc;
+
+--pagTransporte1.html  Cabecera
+
+select TIPO_SLP,
+TOT_CONTENEDORES,
+(select first 1 slt.OBSERVACIONES
+from OPE_SLP_TRANSPORTE_MONITOR.slt
+where odd.CODEMP = slt.CODEMP and
+    odd.ANIO = slt.ANIO and
+    odd.NRO_SLP  = slt.NRO_SLP
+order by slt.FEC_MONITOREO desc ) as ult_evento_transporte
+from OPE_SLP odd
+where odd.CODEMP = '08' and
+    odd.ANIO = '2014' and
+    odd.NRO_SLP  = '2';
+
+--pagTransporte1.html Detalle
+
+select FEC_MONITOREO,
+OBSERVACIONES,
+NRO_CONTENEDOR,
+ESTADO,
+CODEMP,ANIO,NRO_SLP,
+ID_PERSONA,
+COD_TRANSPORTE,
+ITEM
+from OPE_SLP_TRANSPORTE_MONITOR
+where CODEMP = '08' and
+    ANIO = '2014' and
+    NRO_SLP  = '2'
+order by FEC_MONITOREO desc;
+
+--pagAdicional1.html cabecera
+
+select TIPO_SLP,
+TOT_CONTENEDORES,
+(select first 1 slt.DES_ADICIONAL
+from ope_slp_adicionales.slt
+where odd.CODEMP = slt.CODEMP and
+    odd.ANIO = slt.ANIO and
+    odd.NRO_SLP  = slt.NRO_SLP
+order by slt.FEC_REG desc ) as ult_adicional
+from OPE_SLP odd
+where odd.CODEMP = '08' and
+    odd.ANIO = '2014' and
+    odd.NRO_SLP  = '2';
+
+--pagAdicional1.html detalle
+
+select FEC_ADICIONAL,TIPO,
+    DES_ADICIONAL,DETALLE,
+    CODEMP, ANIO, NRO_SLP,
+    TIPO,ITEM
+from OPE_SLP_ADICIONALES
+where CODEMP = '08' and
+    ANIO = '2014' and
+    NRO_SLP  = '2'
+order by FEC_ADICIONAL desc;
+
+--pagAdicionalDetalle.html cabecera
+
+select FEC_ADICIONAL,TIPO,
+    DES_ADICIONAL,DETALLE,
+from OPE_SLP_ADICIONALES
+where CODEMP = '08' and
+    ANIO = '2014' and
+    NRO_SLP  = '2' and
+    TIPO  = '' and
+    ITEM  = ''
+order by FEC_ADICIONAL desc;
