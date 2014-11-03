@@ -16,6 +16,10 @@ on (ob.codemp = od.codemp and ob.anio = od.anio_booking and
  ((current_date - odh.fec_actividad)30  12) );
 
 --Query de Noticias 
+json:
+{cabecera:"SLP 001 - Dua", fecha:"Jue, 23 Oct - 6:00 pm", resumen:"Resumen de Dua 1",rutaImagen:"img/gmaps.gif", descripcion:"Descripcion de la actividad de la DUA. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse accumsan blandit fermentum."}
+
+consulta:
 SELECT FEC_NOTIFICACION,CABECERA,
 RESUMEN,DESCRIPCION,RUTA_IMAGEN
 FROM ope_slp_notificaciones
@@ -24,50 +28,40 @@ COD_APP = '001' AND
 COD_CLIENTE = '20517661211' ORDER BY FEC_NOTIFICACION DESC;
 
  --pagDUA1
+{ nomDua:"234234-118-40",estado:"Regularizada",canal:"Rojo",ultEvento:"Descripcion ultimo Evento 1"}
 
-select ESTADO , canal
-from ope_dua where       CODEMP = '08' and
-    ANIO_DUA = '2014' and
-    COD_ADUANA  = '118' and
-    COD_REGIMEN = '40' and
-    NUM_DUA = '234234'
+select od.ANIO_DUA|| od.COD_ADUANA||od.COD_REGIMEN||od.NUM_DUA as nomDua, od.ESTADO , od.canal,(select first 1 odd.OBSERVACION 
+from ope_dua_documentos_historial odd
+      where odd.CODEMP = od.CODEMP  and
+    odd.ANIO_DUA = od.ANIO_DUA  and
+    odd.COD_ADUANA  = od.COD_ADUANA   and
+    odd.COD_REGIMEN = od.COD_REGIMEN  and
+    odd.NUM_DUA = od.NUM_DUA  order by FEC_ACTIVIDAD ) as ultimo_evento
+from ope_dua od where       od.CODEMP = '08' and
+    od.ANIO_DUA = '2014' and
+    od.COD_ADUANA  = '118' and
+    od.COD_REGIMEN = '40' and
+    od.NUM_DUA = '234234'
 
-select CODEMP,
-    ANIO_DUA,
-    COD_ADUANA,
-    COD_REGIMEN,
-    NUM_DUA,
-    ITEM,
-    ACCION,
-    SOLICITADO,
-    DOCUMENTO,
-    FEC_ACTIVIDAD,
-    OBSERVACION as 'ultimo evento'
-from ope_dua_documentos_historial
-where CODEMP = '08' and
-    ANIO_DUA = '2014' and
-    COD_ADUANA  = '118' and
-    COD_REGIMEN = '40' and
-    NUM_DUA = '234234' and
-    ITEM = (select max(odd.item) from ope_dua_documentos_historial odd
-      where odd.CODEMP = '08' and
-    odd.ANIO_DUA = '2014' and
-    odd.COD_ADUANA  = '118' and
-    odd.COD_REGIMEN = '40' and
-    odd.NUM_DUA = '234234'
-    )
-
-Actualizado 01/11/2014
 
 -- pagDua1.html Detalle
+
+lstDuaDetalle:[{id: "codEmp=08&codDua=2014_118_40_234234&codSlp=1&item=1", fecha:"Lunes, 3 de Noviembre del 2014",hora:"6:59 PM",observacion:"Observacion Evento 001", resumen:"Solicitado: Cliente, Accion: Enviado"},{id: "codEmp=08&codDua=2014_118_40_561561&codSlp=1&item=1", fecha:"Lunes, 3 de Noviembre del 2014",hora:"9:59 AM",observacion:"Observacion Evento 002", resumen:"Solicitado: Cliente02, Accion: Enviado02"},
+        {id: "codEmp=08&codDua=2014_118_40_444444&codSlp=1&item=1", fecha:"Martes, 4 de Noviembre del 2014",hora:"3:59 PM",observacion:"Observacion Evento 003", resumen:"Solicitado: Cliente003, Accion: Enviado004"}]
 
 select FEC_ACTIVIDAD,
     OBSERVACION,
     ACCION,
     SOLICITADO,
-    DOCUMENTO
+    DOCUMENTO,
+    CODEMP,
+    ANIO_DUA,
+    COD_ADUANA,
+    COD_REGIMEN,
+    NUM_DUA,
+    ITEM,
 from ope_dua_documentos_historial
-where CODEMP = '08' and
+where CODEMP = '08' and 
     ANIO_DUA = '2014' and
     COD_ADUANA  = '118' and
     COD_REGIMEN = '40' and
@@ -77,11 +71,19 @@ order by FEC_ACTIVIDAD desc;
 
 -- pagDuaDetalle.html cabecera
 
+duaDetCabecera: { fecha:"Lunes, 3 Nov, 2014 - 6:59 PM",observacion:"Observacion Evento 001",documento:"Documento 001",solicitado:"Solicitado 1",accion:"Accion 1"}
+
 select FEC_ACTIVIDAD,
     OBSERVACION,
     ACCION,
     SOLICITADO,
-    DOCUMENTO
+    DOCUMENTO,
+    CODEMP,
+    ANIO_DUA,
+    COD_ADUANA,
+    COD_REGIMEN,
+    NUM_DUA,
+    ITEM
 from ope_dua_documentos_historial
 where CODEMP = '08' and
     ANIO_DUA = '2014' and
@@ -92,6 +94,8 @@ where CODEMP = '08' and
 order by FEC_ACTIVIDAD desc;
 
 -- pagDuaDetalle.html detalle Documentos
+
+lstArchivosDua:[{ruta: "ruta1.pdf", archivo:"Archivo PDF"},{ruta: "ruta2.doc", archivo:"Archivo Word"},{ruta: "ruta3.xls", archivo:"Archivo Excel"}]
 
 select ITEM_ATTACH,
     RUTA,
@@ -107,8 +111,10 @@ order by FECREG desc;
 
 --pagTransporte1.html  Cabecera
 
-select TIPO_SLP,
-TOT_CONTENEDORES,
+transpCabecera: { numSlp:"01",tipoSlp:"Urgente",contenedores:"4",ultEvento:"Descripcion ultimo Evento Transporte 1"}
+
+select odd.NRO_SLP, odd.TIPO_SLP,
+odd.TOT_CONTENEDORES,
 (select first 1 slt.OBSERVACIONES
 from OPE_SLP_TRANSPORTE_MONITOR.slt
 where odd.CODEMP = slt.CODEMP and
@@ -121,6 +127,8 @@ where odd.CODEMP = '08' and
     odd.NRO_SLP  = '2';
 
 --pagTransporte1.html Detalle
+
+lstTranspDetalle:[{id: "codEmp=08&codSlp=1&itemTransporte=1", fecha:"Lunes, 3 de Noviembre del 2014",hora:"6:59 PM",observacion:"Observacion Transporte 001", resumen:"Estado: En camino, Nro Contenedores: 2"}
 
 select FEC_MONITOREO,
 OBSERVACIONES,
@@ -138,6 +146,8 @@ order by FEC_MONITOREO desc;
 
 --pagAdicional1.html cabecera
 
+adicionalCabecera: { numSlp:"01",tipoSlp:"Urgente",contenedores:"4",ultEvento:"Descripcion ultimo Evento Transporte 1"}
+
 select TIPO_SLP,
 TOT_CONTENEDORES,
 (select first 1 slt.DES_ADICIONAL
@@ -153,6 +163,8 @@ where odd.CODEMP = '08' and
 
 --pagAdicional1.html detalle
 
+lstAdicionalDetalle:[{id: "codEmp=08&codSlp=1&itemTransporte=1", fecha:"Lunes, 3 de Noviembre del 2014",hora:"6:59 PM",observacion:"Observacion Transporte 001", resumen:"Solicitado: Cliente, Accion: Enviado"}
+
 select FEC_ADICIONAL,TIPO,
     DES_ADICIONAL,DETALLE,
     CODEMP, ANIO, NRO_SLP,
@@ -164,6 +176,9 @@ where CODEMP = '08' and
 order by FEC_ADICIONAL desc;
 
 --pagAdicionalDetalle.html cabecera
+
+
+adicionalDetCabecera: { fecha:"Lunes, 3 Nov, 2014 - 6:59 PM",Tipo:"Tipo de Adicional",desAdicional:"desAdicional",detalle:"detalle"}
 
 select FEC_ADICIONAL,TIPO,
     DES_ADICIONAL,DETALLE,
